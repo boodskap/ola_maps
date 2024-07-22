@@ -1,0 +1,2255 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "OLA Maps - API",
+    "version": "0.0.1"
+  },
+  "servers": [
+    {
+      "description": "Directions API Server",
+      "url": "https://api.olamaps.io"
+    }
+  ],
+  "security": [
+    {
+      "api_key_credential": []
+    },
+    {
+      "client_credential": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Directions API",
+      "description": "The Directions API is a service that provides directions between two addresses."
+    }
+  ],
+  "paths": {
+    "/routing/v1/directions": {
+      "post": {
+        "tags": [
+          "Directions API"
+        ],
+        "summary": "Provides routable path between two or more points",
+        "description": "Provides routable path between two or more points. Accepts coordinates in lat,long format.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "name": "origin",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Destination coordinates in the format lat,lng e.g:  12.993103152916301,77.54332622119354",
+            "required": true
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Origin coordinates in the format lat,lng e.g:  12.972006793201695,77.5800850011884",
+            "required": true
+          },
+          {
+            "name": "waypoints",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Waypoints joined by separator (currently '|'). supported as lat,lng pairs - 12.938399,77.632873|12.938041,77.628285",
+            "required": false
+          },
+          {
+            "name": "alternatives",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "True if multiple routes are needed between source and destination",
+            "required": false
+          },
+          {
+            "name": "steps",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "description": "True if steps are needed between source and destination",
+            "required": false
+          },
+          {
+            "name": "overview",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "full"
+            },
+            "description": "Overview geometry either full, simplified or false according to highest zoom level it could be display on, or not at all",
+            "required": false
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "en"
+            },
+            "description": "Language in which the response is expected. At the moment following languages are supported - kn (Kannada), en (English) and hi (Hindi)",
+            "required": false
+          },
+          {
+            "name": "traffic_metadata",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "If this field is true, traffic metadata would be sent in the  response which will contain type of congestion. (travel_advisory data  will only come in response if overview is passed as \"full\")",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/response"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error400"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "500": {
+            "description": "No serviceable boundary found for GeoPoints",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error500"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/places/v1/autocomplete": {
+      "get": {
+        "operationId": "Autocomplete",
+        "tags": [
+          "Search API"
+        ],
+        "summary": "Provides Autocomplete suggestions for a given substring",
+        "description": "Provides Autocomplete suggestions for a given substring satisfying the given criteria",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "name": "input",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "The text string on which to search. The Place Autocomplete service will return candidate matches based on this string and order results based on their perceived relevance",
+            "example": "kempe"
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Location parameter helps in fetching more location specific results. This parameter must be specified as *latitude,longitude*.\\\n**Note** : If the location parameter is not specified, only name  match is given priority.",
+            "example": "12.931316595874005,77.61649243443775"
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Defines the distance (in meters) within which to return place results. This is obeyed when the param strictbounds is set to true"
+          },
+          {
+            "name": "strictbounds",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Returns only those places that are strictly within the radius defined by location and radius. This is a restriction, rather than a bias, meaning that results outside this radius will not be returned even if they match the user input"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Please note there are multiple responses possible based on the scenario. One possibility is autocomplete results are  returned, which is outlined in example and scehma. Other possibility is  zero results which is outlined under schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AutocompleteSuccess"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AutocompleteZeroResults"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "Invalid param 'input': input length, must be >0"
+                    },
+                    "info_messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of informational messages",
+                      "example": []
+                    },
+                    "predictions": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Empty array for predictions",
+                      "example": []
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "description": "X-Request-Id if provided in the request else a auto-generated value is assigned",
+                      "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#10457"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "example": "FAILURE"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": ""
+                    },
+                    "info_messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of informational messages",
+                      "example": []
+                    },
+                    "predictions": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Empty array for predictions",
+                      "example": []
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "example": "FAILURE"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/places/v1/geocode": {
+      "get": {
+        "operationId": "gecode",
+        "tags": [
+          "Search API"
+        ],
+        "summary": "Get geocoded address",
+        "description": "Returns the geocoded address based on the provided parameters",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "address",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The address to be geocoded. It cannot be empty."
+          },
+          {
+            "in": "query",
+            "name": "bounds",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pipe (\"|\") separated lat,lng pairs of two corner points of a bounding box. \nExample: 12.905004590071838,77.60793990913315|12.90221233024448,77.60555810753645\n"
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "English"
+            },
+            "description": "The language in which to return the results. Currently only accepts English."
+          },
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful geocoding response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodingSuccessResponse"
+                },
+                "example": {
+                  "status": "ok",
+                  "geocodingResults": [
+                    {
+                      "formatted_address": "Mumbai, Mumbai Suburban, Mumbai Suburban District, Maharashtra, India",
+                      "types": [],
+                      "name": "Mumbai",
+                      "geometry": {
+                        "viewport": {
+                          "southwest": {
+                            "lng": 72.87232696702962,
+                            "lat": 19.114096358602232
+                          },
+                          "northeast": {
+                            "lng": 72.87498903297039,
+                            "lat": 19.116611641397768
+                          }
+                        },
+                        "location": {
+                          "lng": 72.873658,
+                          "lat": 19.115354
+                        },
+                        "location_type": "geometric_center"
+                      },
+                      "address_components": [
+                        {
+                          "types": [
+                            "country"
+                          ],
+                          "short_name": "India",
+                          "long_name": "India"
+                        },
+                        {
+                          "types": [
+                            "administrative_area_level_1"
+                          ],
+                          "short_name": "Maharashtra",
+                          "long_name": "Maharashtra"
+                        },
+                        {
+                          "types": [
+                            "administrative_area_level_2"
+                          ],
+                          "short_name": "Mumbai Suburban District",
+                          "long_name": "Mumbai Suburban District"
+                        },
+                        {
+                          "types": [
+                            "administrative_area_level_3"
+                          ],
+                          "short_name": "Mumbai Suburban",
+                          "long_name": "Mumbai Suburban"
+                        },
+                        {
+                          "types": [
+                            "locality"
+                          ],
+                          "short_name": "Mumbai",
+                          "long_name": "Mumbai"
+                        },
+                        {
+                          "types": [
+                            "postal_code"
+                          ],
+                          "short_name": "400059",
+                          "long_name": "400059"
+                        },
+                        {
+                          "types": [
+                            "street_address"
+                          ],
+                          "short_name": "Road Number 16",
+                          "long_name": "Road Number 16"
+                        }
+                      ],
+                      "plus_code": {
+                        "compound_code": "NA",
+                        "global_code": "NA"
+                      },
+                      "place_id": "ola:whosonfirst:locality:1",
+                      "layer": [
+                        "locality"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or empty address parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodingErrorResponse"
+                },
+                "example": {
+                  "reason": "invalid or empty address parameter",
+                  "status": "bad_request",
+                  "request_id": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#727739"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodingErrorResponse"
+                },
+                "example": {
+                  "reason": "Internal service error",
+                  "status": "error",
+                  "request_id": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#727739"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/places/v1/reverse-geocode": {
+      "get": {
+        "operationId": "reverse geocode",
+        "tags": [
+          "Search API"
+        ],
+        "summary": "Provides information of a place based on the location provided",
+        "description": "Provides information of a place based on the location provided satisfying the given criteria",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "name": "latlng",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The coordinates of which you want to do the reverse geocoding to get the address",
+            "example": "12.931316595874005,77.61649243443775"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. Please note there are multiple responses possible  based on the scenario. One possibility is autocomplete results are returned,  which is outlined in example and scehma. Other possibility is zero results  which is outlined under schema",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReverseGeoSuccess"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ReverseGeoZeroResults"
+                    }
+                  ]
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error_message": {
+                      "type": "string",
+                      "description": "Error message",
+                      "example": "INVALID_LATLNG/INVALID_TYPE"
+                    },
+                    "info_messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of informational messages",
+                      "example": []
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Empty array for results",
+                      "example": []
+                    },
+                    "plus_code": {
+                      "type": "object",
+                      "properties": {
+                        "compound_code": {
+                          "type": "string",
+                          "example": "NA"
+                        },
+                        "global_code": {
+                          "type": "string",
+                          "example": "NA"
+                        }
+                      }
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "description": "X-Request-Id if provided in the request else a auto-generated value is assigned",
+                      "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#10457"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "example": "zero_results"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "info_messages": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Array of informational messages",
+                      "example": []
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Empty array for results",
+                      "example": []
+                    },
+                    "plus_code": {
+                      "type": "object",
+                      "properties": {
+                        "compound_code": {
+                          "type": "string",
+                          "example": "NA"
+                        },
+                        "global_code": {
+                          "type": "string",
+                          "example": "NA"
+                        }
+                      }
+                    },
+                    "request_id": {
+                      "type": "string",
+                      "description": "X-Request-Id if provided in the request else a auto-generated value is assigned",
+                      "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#10457"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Status of the response",
+                      "example": "zero_results"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Request-Id": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-Id": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tiles/vector/v1/data/{datasetName}.json": {
+      "get": {
+        "operationId": "data_layer_list",
+        "tags": [
+          "Map Tiles"
+        ],
+        "description": "Get array of data's TileJSONs",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "in": "path",
+            "name": "datasetName",
+            "description": "Name of the dataset",
+            "schema": {
+              "type": "string",
+              "example": "planet"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "This API provides array of objects for data tilejsons, List of all the data sets that are available for the tiling service",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetArrayOfDataTilejsons"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-ID": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/tiles/vector/v1/data/{datasetName}/{z}/{x}/{y}.pbf": {
+      "get": {
+        "operationId": "tile_endpoint",
+        "tags": [
+          "Map Tiles"
+        ],
+        "description": "Returns the PBF file for data",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "in": "path",
+            "name": "datasetName",
+            "description": "Name of the dataset",
+            "schema": {
+              "type": "string",
+              "example": "planet"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "z",
+            "description": "Mercator tiles's zoom level",
+            "schema": {
+              "type": "number",
+              "example": 14
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "x",
+            "description": "Specifies the tile's column {x}, as described in the Slippy Map Tilenames specification.",
+            "schema": {
+              "type": "number",
+              "example": 110
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "y",
+            "description": "Specifies the tile's row {y}, as described in the Slippy Map Tilenames specification.",
+            "schema": {
+              "type": "number",
+              "example": 1010
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A PBF file",
+            "content": {
+              "application/x-protobuf": {
+                "schema": {
+                  "type": "string",
+                  "description": "Returns binary data",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-ID": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/tiles/vector/v1/styles.json": {
+      "get": {
+        "operationId": "stlye_list",
+        "tags": [
+          "Map Tiles"
+        ],
+        "description": "`{style-name}-lite`: The Lite version of the map style will only include a selection of features, with a primary focus on Navigation platforms. \\\n`{style-name}-standard`: The Standard version will have a more granular level of information than lite which can be used for viewing purposes and across all platforms such as mobility, portals, and websites. \\\n`{style-name}-full`: Full version will include all the available data of the map features which might not be used now but users will have the option to customize according to their preference. Datasets such as glaciers, and house numbers. (Currently, the full version is WIP and is a copy of the standard) \\\n\\\n*Ex. For default light, `default-light-lite`, `default-light-standard` & `default-light-full` will be the style names*\n",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "This API provides array of objects for all styles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetArrayOfAllStyles"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-ID": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/tiles/vector/v1/styles/{styleName}/style.json": {
+      "get": {
+        "operationId": "style_detail",
+        "tags": [
+          "Map Tiles"
+        ],
+        "description": "Get detail of a style, This is useful for software developers who want to programmatically read these resources. It isn't necessary for you to read or understand this reference to design or use Mapbox/Maplibre maps. You will need to be familiar with the MapLibre Style Specification to use the Styles API. The Maplibre Style Specification defines the structure of map styles and is the open standard that helps maplibre communicate with APIs and produce maps that are compatible with Maplibre libraries.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "in": "path",
+            "name": "styleName",
+            "description": "Name of the style",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "default-light-standard"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "This API provides array of objects for all styles, This is the endpoint that the clients (mapbox/leaflet/deck gl/maplibre) will consume for the styled layers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetDetailOfAStyle"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-ID": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/tiles/vector/v1/fonts/{fontstack}/{start}-{end}.pbf": {
+      "get": {
+        "operationId": "font_pbf_endpoint",
+        "tags": [
+          "Map Tiles"
+        ],
+        "description": "While glyph ranges are usually not of interest unless you're building a map renderer, this is the endpoint you can use to access them. Font glyph ranges are protocol buffer-encoded signed distance fields. They can be used to show fonts at a variety of scales and rotations. One glyph is used at all scales.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/x_request_id"
+          },
+          {
+            "$ref": "#/components/parameters/x_correlation_id"
+          },
+          {
+            "in": "path",
+            "name": "fontstack",
+            "description": "Name of the Font Stack",
+            "schema": {
+              "type": "string",
+              "example": "Noto%20Sans%20Bold"
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "start",
+            "description": "Start tile number",
+            "schema": {
+              "type": "number",
+              "example": 0
+            },
+            "required": true
+          },
+          {
+            "in": "path",
+            "name": "end",
+            "description": "End tile number",
+            "schema": {
+              "type": "number",
+              "example": 255
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A PBF file",
+            "content": {
+              "application/x-protobuf": {
+                "schema": {
+                  "type": "string",
+                  "description": "Returns binary data",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "X-Request-ID": {
+                "$ref": "#/components/headers/x_request_id"
+              },
+              "X-Correlation-ID": {
+                "$ref": "#/components/headers/x_correlation_id"
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GetArrayOfAllStyles": {
+        "description": "Get list of all styles",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "name": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          }
+        },
+        "example": [
+          {
+            "version": 8,
+            "name": "Light",
+            "id": "light",
+            "url": "https://api.olamaps.io/tiles/vector/v1/styles/default-light-standard/style.json"
+          }
+        ]
+      },
+      "GetArrayOfAllFonts": {
+        "description": "Get list of all fonts",
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "example": [
+          "Arial Unicode MS Regular",
+          "Lato Bold",
+          "Lato Italic",
+          "Lato Light",
+          "Lato Medium",
+          "Lato Regular",
+          "Lato Semi Bold"
+        ]
+      },
+      "GetArrayOfStyleTilejsons": {
+        "description": "Get list of all style's tilejson",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "tilejson": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "attribution": {
+              "type": "string"
+            },
+            "minzoom": {
+              "type": "number"
+            },
+            "maxzoom": {
+              "type": "number"
+            },
+            "bounds": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "format": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "tiles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "center": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "example": [
+          {
+            "tilejson": "2.0.0",
+            "name": "Dark",
+            "attribution": "",
+            "minzoom": 0,
+            "maxzoom": 20,
+            "bounds": [
+              -180,
+              -85.0511,
+              180,
+              85.0511
+            ],
+            "format": "png",
+            "type": "baselayer",
+            "tiles": [
+              "https://api.olamaps.io/tiles/vector/v1/styles/dark/{z}/{x}/{y}.png"
+            ],
+            "center": [
+              0,
+              0,
+              2
+            ]
+          }
+        ]
+      },
+      "GetArrayOfDataTilejsons": {
+        "description": "Get list of all data tilejson",
+        "type": "object",
+        "properties": {
+          "tiles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "basename": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "minzoom": {
+            "type": "number"
+          },
+          "maxzoom": {
+            "type": "number"
+          },
+          "bounds": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "vector_layers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "fields": {
+                  "type": "string"
+                },
+                "minzoom": {
+                  "type": "string"
+                },
+                "maxzoom": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "center": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "tilejson": {
+            "type": "string"
+          }
+        },
+        "example": [
+          {
+            "tiles": [
+              "https://api.olamaps.io/tiles/vector/v1/data/planet/{z}/{x}/{y}.pbf"
+            ],
+            "name": "Tilemaker to OpenMapTiles schema",
+            "format": "pbf",
+            "basename": "planet.mbtiles",
+            "id": "planet",
+            "type": "baselayer",
+            "version": "3.0",
+            "description": "Tile config based on OpenMapTiles schema",
+            "minzoom": 0,
+            "maxzoom": 14,
+            "bounds": [
+              -16.30824,
+              -57.092814,
+              180,
+              61.648162
+            ],
+            "vector_layers": [
+              {
+                "id": "place",
+                "fields": {
+                  "class": "String",
+                  "iso_a2": "String",
+                  "name:latin": "String",
+                  "rank": "Number"
+                },
+                "minzoom": 0,
+                "maxzoom": 14
+              }
+            ],
+            "center": [
+              81.84588000000001,
+              2.2776739999999975,
+              7
+            ],
+            "tilejson": "2.0.0"
+          }
+        ]
+      },
+      "GetDetailOfAStyle": {
+        "description": "Get detail of a style",
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "object",
+            "properties": {
+              "openmaptiles": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "glyphs": {
+            "type": "string"
+          },
+          "layers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "paint": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "example": {
+          "id": "positron",
+          "version": 8,
+          "name": "Light",
+          "sources": {
+            "openmaptiles": {
+              "type": "vector",
+              "url": "https://api.olamaps.io/tiles/vector/v1/data/planet.json"
+            }
+          },
+          "glyphs": "https://api.olamaps.io/tiles/vector/v1/fonts/{fontstack}/{range}.pbf",
+          "layers": [
+            {
+              "id": "water",
+              "type": "fill",
+              "source": "openmaptiles",
+              "source-layer": "water",
+              "filter": [
+                "all",
+                [
+                  "==",
+                  "$type",
+                  "Polygon"
+                ],
+                [
+                  "!=",
+                  "brunnel",
+                  "tunnel"
+                ]
+              ],
+              "layout": {
+                "visibility": "visible"
+              },
+              "paint": {
+                "fill-antialias": true,
+                "fill-color": "rgb(194, 200, 202)"
+              }
+            }
+          ]
+        }
+      },
+      "GetStaticImageBadRequest": {
+        "description": "Get static image bad request",
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Required valid url parameter as 'size'"
+          }
+        }
+      },
+      "GetStaticImageOfAStyle": {
+        "description": "Get static image of style",
+        "type": "string",
+        "format": "binary"
+      },
+      "ReverseGeoZeroResults": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": "Error message, if any",
+            "example": "ZERO RESULTS"
+          },
+          "info_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of informational messages",
+            "example": []
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Array of results, would be empty in zero results case",
+            "example": []
+          },
+          "plus_code": {
+            "type": "object",
+            "properties": {
+              "compound_code": {
+                "type": "string",
+                "example": "NA"
+              },
+              "global_code": {
+                "type": "string",
+                "example": "NA"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the response",
+            "example": "zero_results"
+          }
+        }
+      },
+      "ReverseGeoSuccess": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": "Error message, if any",
+            "example": ""
+          },
+          "info_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of informational messages",
+            "example": []
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "formatted_address": {
+                  "type": "string",
+                  "description": "Formatted address",
+                  "example": "West Oidar Services, Central Tax, Bangalore, 560085, Phase 3, Banashankari, Bengaluru, Karnataka"
+                },
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Array of types",
+                  "example": [
+                    "point_of_interest",
+                    "establishment"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Name of the place",
+                  "example": "West Oidar Services, Central Tax, Bangalore"
+                },
+                "geometry": {
+                  "type": "object",
+                  "properties": {
+                    "viewport": {
+                      "type": "object",
+                      "properties": {
+                        "southwest": {
+                          "type": "object",
+                          "properties": {
+                            "lng": {
+                              "type": "number",
+                              "example": 77.55141967245793
+                            },
+                            "lat": {
+                              "type": "number",
+                              "example": 12.922552358602232
+                            }
+                          }
+                        },
+                        "northeast": {
+                          "type": "object",
+                          "properties": {
+                            "lng": {
+                              "type": "number",
+                              "example": 77.55400032754208
+                            },
+                            "lat": {
+                              "type": "number",
+                              "example": 12.925067641397767
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "location": {
+                      "type": "object",
+                      "properties": {
+                        "lng": {
+                          "type": "number",
+                          "example": 77.55271
+                        },
+                        "lat": {
+                          "type": "number",
+                          "example": 12.92381
+                        }
+                      }
+                    },
+                    "location_type": {
+                      "type": "string",
+                      "description": "Type of location",
+                      "example": "rooftop"
+                    }
+                  }
+                },
+                "address_components": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "types": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "example": [
+                            "country"
+                          ]
+                        }
+                      },
+                      "short_name": {
+                        "type": "string",
+                        "example": "India"
+                      },
+                      "long_name": {
+                        "type": "string",
+                        "example": "India"
+                      }
+                    }
+                  }
+                },
+                "plus_code": {
+                  "type": "object",
+                  "properties": {
+                    "compound_code": {
+                      "type": "string",
+                      "example": "NA"
+                    },
+                    "global_code": {
+                      "type": "string",
+                      "example": "NA"
+                    }
+                  }
+                },
+                "place_id": {
+                  "type": "string",
+                  "description": "Place ID",
+                  "example": "ola:lbs_v2:venue:90be49b9e86d386a7076e25f71b402ca"
+                },
+                "layer": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": "venue"
+                  }
+                }
+              }
+            }
+          },
+          "plus_code": {
+            "type": "object",
+            "properties": {
+              "compound_code": {
+                "type": "string",
+                "example": "NA"
+              },
+              "global_code": {
+                "type": "string",
+                "example": "NA"
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the response",
+            "example": "ok"
+          }
+        }
+      },
+      "AutocompleteZeroResults": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": "Error message, if any",
+            "example": "ZERO RESULTS"
+          },
+          "info_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of informational messages",
+            "example": []
+          },
+          "predictions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Array of results, would be empty in zero results case",
+            "example": []
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the response",
+            "example": "ok"
+          }
+        }
+      },
+      "AutocompleteSuccess": {
+        "type": "object",
+        "properties": {
+          "error_message": {
+            "type": "string",
+            "description": "Error message, if any",
+            "example": ""
+          },
+          "info_messages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of informational messages",
+            "example": []
+          },
+          "predictions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reference": {
+                  "type": "string",
+                  "description": "Reference value",
+                  "example": "ChIJZWJEdf4crjsRjkEpoelwbCk"
+                },
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Array of types",
+                  "example": [
+                    "airport",
+                    "point_of_interest",
+                    "establishment"
+                  ]
+                },
+                "matched_substrings": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "offset": {
+                        "type": "integer"
+                      },
+                      "length": {
+                        "type": "integer",
+                        "example": 5
+                      }
+                    }
+                  },
+                  "description": "Array of matched substrings"
+                },
+                "distance_meters": {
+                  "type": "integer",
+                  "description": "Distance in meters",
+                  "example": 31312
+                },
+                "terms": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "offset": {
+                        "type": "integer"
+                      },
+                      "value": {
+                        "type": "string",
+                        "example": "Kempegowda International Airport Bengaluru (BLR)"
+                      }
+                    }
+                  },
+                  "description": "Array of terms"
+                },
+                "structured_formatting": {
+                  "type": "object",
+                  "properties": {
+                    "main_text_matched_substrings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "offset": {
+                            "type": "integer"
+                          },
+                          "length": {
+                            "type": "integer",
+                            "example": 5
+                          }
+                        }
+                      }
+                    },
+                    "secondary_text": {
+                      "type": "string",
+                      "example": "KIAL Rd, Devanahalli, Bengaluru, Karnataka, India"
+                    },
+                    "main_text": {
+                      "type": "string",
+                      "example": "Kempegowda International Airport Bengaluru (BLR)"
+                    }
+                  },
+                  "description": "Structured formatting details"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Description of the prediction",
+                  "example": "Kempegowda International Airport Bengaluru (BLR), KIAL Rd, Devanahalli, Bengaluru, Karnataka, India"
+                },
+                "geometry": {
+                  "type": "object",
+                  "description": "Coordinates of the place",
+                  "properties": {
+                    "location": {
+                      "type": "object",
+                      "description": "Coordinates of the place",
+                      "properties": {
+                        "lng": {
+                          "type": "number",
+                          "description": "Longitude",
+                          "example": 77.61194
+                        },
+                        "lat": {
+                          "type": "number",
+                          "description": "Latitude",
+                          "example": 13.05158
+                        }
+                      }
+                    }
+                  }
+                },
+                "place_id": {
+                  "type": "string",
+                  "description": "Place ID",
+                  "example": "ola:lbs_v2:venue:a1e99e3bd07b545284643f7bde183120"
+                }
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the response",
+            "example": "ok"
+          }
+        }
+      },
+      "GeocodingResult": {
+        "type": "object",
+        "properties": {
+          "formatted_address": {
+            "type": "string"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "viewport": {
+                "type": "object",
+                "properties": {
+                  "southwest": {
+                    "type": "object",
+                    "properties": {
+                      "lng": {
+                        "type": "number"
+                      },
+                      "lat": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "northeast": {
+                    "type": "object",
+                    "properties": {
+                      "lng": {
+                        "type": "number"
+                      },
+                      "lat": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              "location": {
+                "type": "object",
+                "properties": {
+                  "lng": {
+                    "type": "number"
+                  },
+                  "lat": {
+                    "type": "number"
+                  }
+                }
+              },
+              "location_type": {
+                "type": "string"
+              }
+            }
+          },
+          "address_components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "short_name": {
+                  "type": "string"
+                },
+                "long_name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "plus_code": {
+            "type": "object",
+            "properties": {
+              "compound_code": {
+                "type": "string",
+                "nullable": true
+              },
+              "global_code": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "place_id": {
+            "type": "string"
+          },
+          "layer": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "GeocodingSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "geocodingResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeocodingResult"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "zero_results",
+              "bad_request"
+            ],
+            "example": "ok"
+          },
+          "request_id": {
+            "type": "string",
+            "nullable": true,
+            "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#724267"
+          }
+        }
+      },
+      "GeocodingErrorResponse": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Error message"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "zero_results",
+              "bad_request"
+            ],
+            "example": "error"
+          },
+          "request_id": {
+            "type": "string",
+            "nullable": true,
+            "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#724267"
+          }
+        }
+      },
+      "response": {
+        "type": "object",
+        "properties": {
+          "geocoded_waypoints": {
+            "$ref": "#/components/schemas/geocoded_waypoints"
+          },
+          "routes": {
+            "$ref": "#/components/schemas/routes"
+          },
+          "status": {
+            "$ref": "#/components/schemas/status"
+          },
+          "source_from": {
+            "$ref": "#/components/schemas/source_from"
+          }
+        }
+      },
+      "error400": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Error reason",
+            "example": "Invalid/missing origin"
+          },
+          "request_type": {
+            "type": "string",
+            "description": "Request made for",
+            "example": "directions"
+          },
+          "request_id": {
+            "type": "string",
+            "description": "X-Request-Id if provided in the request else a auto-generated value is assigned",
+            "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#10457"
+          },
+          "status": {
+            "type": "string",
+            "description": "Category of failure",
+            "example": "BAD_REQUEST"
+          }
+        }
+      },
+      "error500": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Error reason",
+            "example": "No serviceable boundary found for GeoPoints"
+          },
+          "request_type": {
+            "type": "string",
+            "description": "Request made for",
+            "example": "directions"
+          },
+          "request_id": {
+            "type": "string",
+            "description": "X-Request-Id if provided in the request else a auto-generated value is assigned",
+            "example": "ca8a1960-a734-41e5-96f2-7aa5d2afd9ca#10457"
+          },
+          "status": {
+            "type": "string",
+            "description": "Category of failure",
+            "example": "FAILURE"
+          }
+        }
+      },
+      "geocoded_waypoints": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "geocoder_status": {
+              "type": "string",
+              "description": "OK",
+              "example": "OK"
+            },
+            "place_id": {
+              "type": "string",
+              "description": "tdqcey303",
+              "example": "tdqcey303"
+            },
+            "types": {
+              "type": "array",
+              "items": {
+                "properties": {}
+              },
+              "example": []
+            }
+          }
+        }
+      },
+      "routes": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "bounds": {
+              "type": "object",
+              "properties": {}
+            },
+            "copyrights": {
+              "type": "string",
+              "example": "OLA Map data ©2024"
+            },
+            "legs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/legs"
+              }
+            },
+            "overview_polyline": {
+              "type": "string",
+              "example": "u`nAoc~uMeg[cij@ld^eo@tAt[kefCg|^zjArxb@wmD~xCyiDovAsf_Ahz[gwlAklHawnCoouAekv@xyZobWchq@D|aw@mahBar@dpDwMga`J_h_EqrfCiMq|dA`zbAsxArkj@u`vAjEsoqDhkbBmuoC|~SovAenYmgbBh_z@eqw@kcEkklAvnkAuwhAg_Q_gtDpo~BsiiBmrs@uhArr_BguoApeVa_@jio@"
+            },
+            "travel_advisory": {
+              "type": "string",
+              "example": "1,2,0|2,5,0|5,8,10",
+              "description": "this field will only appear if overview passed as full and traffic_metadata passed as true in request"
+            },
+            "summary": {
+              "type": "string",
+              "example": ""
+            },
+            "warnings": {
+              "type": "array",
+              "items": {
+                "properties": {}
+              },
+              "example": []
+            },
+            "waypoint_order": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      },
+      "status": {
+        "type": "string",
+        "example": "OK"
+      },
+      "source_from": {
+        "type": "string",
+        "example": "Ola Maps"
+      },
+      "legs": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number",
+            "example": "3836"
+          },
+          "readable_distance": {
+            "type": "string",
+            "example": "3.8 km"
+          },
+          "duration": {
+            "type": "number",
+            "example": 698
+          },
+          "readable_duration": {
+            "type": "string",
+            "example": "14 mins"
+          },
+          "end_address": {
+            "type": "string",
+            "example": "12.93397277.611342"
+          },
+          "end_location": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "example": 12.933972
+              },
+              "lng": {
+                "type": "number",
+                "example": 77.611342
+              }
+            }
+          },
+          "start_address": {
+            "type": "string",
+            "example": "12.90934277.621689"
+          },
+          "start_location": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "example": 12.909342
+              },
+              "lng": {
+                "type": "number",
+                "example": 77.621689
+              }
+            }
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/steps"
+            }
+          }
+        }
+      },
+      "steps": {
+        "type": "object",
+        "properties": {
+          "distance": {
+            "type": "number",
+            "example": 476
+          },
+          "readable_distance": {
+            "type": "string",
+            "example": "0.5 km"
+          },
+          "duration": {
+            "type": "number",
+            "example": 99
+          },
+          "readable_duration": {
+            "type": "string",
+            "example": "0 hours 2 min"
+          },
+          "start_location": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "example": 12.90934
+              },
+              "lng": {
+                "type": "number",
+                "example": 77.62169
+              }
+            }
+          },
+          "end_location": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "number",
+                "example": 12.908710000000001
+              },
+              "lng": {
+                "type": "number",
+                "example": 77.62158
+              }
+            }
+          },
+          "instructions": {
+            "type": "string",
+            "example": "Head west on NH48"
+          },
+          "maneuver": {
+            "type": "string",
+            "example": "turn-right"
+          },
+          "bearing_before": {
+            "type": "number",
+            "example": 0
+          },
+          "bearing_after": {
+            "type": "number",
+            "example": 259
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "No API key found in request"
+                }
+              }
+            }
+          }
+        },
+        "headers": {
+          "X-Request-Id": {
+            "$ref": "#/components/headers/x_request_id"
+          },
+          "X-Correlation-Id": {
+            "$ref": "#/components/headers/x_correlation_id"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key_credential": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "api_key"
+      },
+      "client_credential": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://account.olamaps.io/realms/olamaps/protocol/openid-connect/token",
+            "refreshUrl": "https://account.olamaps.io/realms/olamaps/protocol/openid-connect/token",
+            "scopes": {
+              "openid": "Default",
+              "olamaps": "Includes OLA Maps API Permissions"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "x_request_id": {
+        "name": "X-Request-Id",
+        "in": "header",
+        "schema": {
+          "type": "string"
+        },
+        "description": "A UUIDv4 unique to that HTTP request and response combination"
+      },
+      "x_correlation_id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "schema": {
+          "type": "string"
+        },
+        "description": "A UUIDv4 unique over a series of requests and responses, identifying a transaction"
+      }
+    },
+    "headers": {
+      "x_request_id": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "A UUIDv4 unique to that HTTP request and response combination"
+      },
+      "x_correlation_id": {
+        "schema": {
+          "type": "string"
+        },
+        "description": "A UUIDv4 unique over a series of requests and responses, identifying a transaction"
+      }
+    }
+  }
+}
